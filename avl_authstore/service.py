@@ -24,9 +24,7 @@ from .utils import sanitizar_cpf, formatar_cpf
 class UserDictionaryService:
     """
     Serviço central de autenticação e gerenciamento de usuários em memória.
-    Atua como fachada de alto nível para a estrutura de dados AVL.
     """
-
     def __init__(self, arvore: Optional[AVLTree] = None) -> None:
         """
         Inicializa o serviço de usuários.
@@ -51,9 +49,7 @@ class UserDictionaryService:
         with self._lock:
             return self._tree.altura_total()
 
-    # =========================================================================
     # RF01 - Cadastrar Cliente
-    # =========================================================================
 
     def cadastrar_cliente(
         self, cpf: str, nome: str, email: str, senha_pura: str
@@ -112,9 +108,7 @@ class UserDictionaryService:
                 "data_cadastro": payload.data_cadastro,
             }
 
-    # =========================================================================
     # RF02 - Autenticar Cliente
-    # =========================================================================
 
     def autenticar_cliente(
         self, cpf: str, senha_pura: str
@@ -160,9 +154,7 @@ class UserDictionaryService:
             else:
                 return False, "Credenciais inválidas: Senha incorreta.", None
 
-    # =========================================================================
     # RF03 - Remover Cliente
-    # =========================================================================
 
     def remover_cliente(self, cpf: str) -> bool:
         """
@@ -185,9 +177,7 @@ class UserDictionaryService:
             # Dispara remoção balanceada O(log n)
             return self._tree.remover(cpf_limpo)
 
-    # =========================================================================
     # RF04 - Atualizar Cadastro
-    # =========================================================================
 
     def atualizar_cliente(
         self,
@@ -260,9 +250,7 @@ class UserDictionaryService:
                 "data_cadastro": novo_payload.data_cadastro,
             }
 
-    # =========================================================================
     # RF05 - Listar/Consultar Ordenada (In-Order Traversal)
-    # =========================================================================
 
     def listar_clientes_ordenados(self) -> List[Dict[str, Any]]:
         """
@@ -287,9 +275,7 @@ class UserDictionaryService:
                 for cpf, payload in registros
             ]
 
-    # =========================================================================
     # RF06 - Verificação de Balanceamento
-    # =========================================================================
 
     def obter_fator_balanceamento(self, cpf: str) -> int:
         """

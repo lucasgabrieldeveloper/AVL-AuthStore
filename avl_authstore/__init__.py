@@ -1,6 +1,5 @@
 """
-AVL-AuthStore: Sistema de Cadastro e Autenticação em Memória
-baseado em Árvore AVL balanceada atuando como Dicionário Chave-Valor.
+AVL-AuthStore: Sistema de Cadastro e Autenticação em Memória baseado em Árvore AVL
 """
 
 from .models import ClientePayload, AVLNode

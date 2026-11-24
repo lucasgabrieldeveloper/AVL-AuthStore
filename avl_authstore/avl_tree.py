@@ -1,6 +1,4 @@
 """
-Implementação Manual e Estrita de Árvore AVL atuando como Dicionário Chave-Valor.
-
 Garante que todas as operações de busca, inserção e remoção ocorram em tempo O(log n)
 no pior caso, mantendo a invariante de que para todo nó v, |FB(v)| <= 1.
 
@@ -31,29 +29,21 @@ class CPFNotFoundError(Exception):
 class AVLTree:
     """
     Árvore AVL (Adelson-Velsky e Landis) implementada manualmente como Dicionário.
-
-    Atributos:
-        raiz (Optional[AVLNode]): Ponteiro para o nó raiz da árvore.
-        total_nodes (int): Contagem total de nós atualmente armazenados na árvore.
     """
 
     def __init__(self) -> None:
         """
         Inicializa um dicionário AVL vazio.
-        Etapa 1: A raiz é definida como None.
-        Etapa 2: O contador total de nós é iniciado em 0.
         """
         self.raiz: Optional[AVLNode] = None
         self.total_nodes: int = 0
 
-    # =========================================================================
-    # 1. Métodos Auxiliares de Altura e Fator de Balanceamento (FB)
-    # =========================================================================
+    # Métodos Auxiliares de Altura e Fator de Balanceamento (FB)
 
     def _altura(self, no: Optional[AVLNode]) -> int:
         """
         Etapa: Retorna a altura de um nó específico de forma segura.
-        - Se o nó for nulo (None), a altura é considerada 0 (convenção AVL padrão).
+        - Se o nó for nulo, a altura é considerada 0.
         - Se o nó existir, retorna seu atributo de altura previamente calculado.
         Complexidade: O(1).
         """
@@ -76,43 +66,19 @@ class AVLTree:
         Etapa: Calcula o Fator de Balanceamento (FB) de um nó.
         Convenção unificada adotada:
             FB = altura(subárvore esquerda) - altura(subárvore direita)
-
-        Interpretação:
-            FB > 0  -> Subárvore esquerda mais alta (pesada à esquerda).
-            FB < 0  -> Subárvore direita mais alta (pesada à direita).
-            FB == 0 -> Subárvores perfeitamente equilibradas em altura.
-            |FB| > 1 -> Invariante violada! Disparar rebalanceamento imediato.
         Complexidade: O(1).
         """
         if no is None:
             return 0
         return self._altura(no.esquerda) - self._altura(no.direita)
 
-    # =========================================================================
-    # 2. Métodos de Rotação Manual
-    # =========================================================================
+    # Métodos de Rotação Manual
 
     def rotacaoLL(self, no: AVLNode) -> AVLNode:
         r"""
         Rotação Simples à Direita (Caso Left-Left / LL).
         Aplicada quando o nó está desbalanceado para a esquerda (FB > 1) e a inserção
         ou o desequilíbrio ocorreu na subárvore esquerda do filho esquerdo (FB_filho >= 0).
-
-        Diagrama de Transformação:
-                 A (no)                      B (nova_raiz)
-                / \                         / \
-               B   T3       ===>           T1  A
-              / \                             / \
-             T1  T2                          T2  T3
-
-        Passo a passo da implementação:
-        1. Identifica a nova raiz: o filho esquerdo do nó desbalanceado ('B').
-        2. Isola a subárvore que trocará de pai: o filho direito da nova raiz ('T2').
-        3. Realiza a rotação: o nó original ('A') se torna filho direito da nova raiz ('B').
-        4. Realoca a subárvore 'T2' como filho esquerdo do nó original ('A').
-        5. Recalcula a altura do nó 'A' (que desceu de nível).
-        6. Recalcula a altura da nova raiz 'B' (que subiu de nível).
-        7. Retorna a nova raiz para ser conectada ao pai na recursão.
         """
         # Passo 1: Salva referência para a nova raiz
         nova_raiz = no.esquerda
@@ -139,22 +105,6 @@ class AVLTree:
         Rotação Simples à Esquerda (Caso Right-Right / RR).
         Aplicada quando o nó está desbalanceado para a direita (FB < -1) e a inserção
         ou o desequilíbrio ocorreu na subárvore direita do filho direito (FB_filho <= 0).
-
-        Diagrama de Transformação:
-               A (no)                         B (nova_raiz)
-              / \                            / \
-             T1  B           ===>           A   T3
-                / \                        / \
-               T2  T3                     T1  T2
-
-        Passo a passo da implementação:
-        1. Identifica a nova raiz: o filho direito do nó desbalanceado ('B').
-        2. Isola a subárvore que trocará de pai: o filho esquerdo da nova raiz ('T2').
-        3. Realiza a rotação: o nó original ('A') se torna filho esquerdo da nova raiz ('B').
-        4. Realoca a subárvore 'T2' como filho direito do nó original ('A').
-        5. Recalcula a altura do nó 'A' (que desceu de nível).
-        6. Recalcula a altura da nova raiz 'B' (que subiu de nível).
-        7. Retorna a nova raiz para ser conectada ao pai na recursão.
         """
         # Passo 1: Salva referência para a nova raiz
         nova_raiz = no.direita
@@ -181,13 +131,6 @@ class AVLTree:
         Rotação Dupla à Direita (Caso Left-Right / LR).
         Aplicada quando o nó está pesado à esquerda (FB > 1), porém seu filho esquerdo
         está pesado à direita (FB < 0) em formato de 'joelho' ou 'ziguezague'.
-
-        Passo a passo da implementação:
-        1. Aplica uma Rotação Simples à Esquerda (rotacaoRR) sobre o filho esquerdo do nó,
-           transformando o formato ziguezague em formato linear (LL).
-        2. Conecta o resultado como o novo filho esquerdo do nó.
-        3. Aplica uma Rotação Simples à Direita (rotacaoLL) sobre o nó principal.
-        4. Retorna a nova raiz resultante.
         """
         assert no.esquerda is not None, "rotacaoLR chamada em nó com filho esquerdo nulo"
         # Passo 1 e 2: Rotação simples à esquerda no filho esquerdo
@@ -201,13 +144,6 @@ class AVLTree:
         Rotação Dupla à Esquerda (Caso Right-Left / RL).
         Aplicada quando o nó está pesado à direita (FB < -1), porém seu filho direito
         está pesado à esquerda (FB > 0) em formato de 'joelho' ou 'ziguezague'.
-
-        Passo a passo da implementação:
-        1. Aplica uma Rotação Simples à Direita (rotacaoLL) sobre o filho direito do nó,
-           transformando o formato ziguezague em formato linear (RR).
-        2. Conecta o resultado como o novo filho direito do nó.
-        3. Aplica uma Rotação Simples à Esquerda (rotacaoRR) sobre o nó principal.
-        4. Retorna a nova raiz resultante.
         """
         assert no.direita is not None, "rotacaoRL chamada em nó com filho direito nulo"
         # Passo 1 e 2: Rotação simples à direita no filho direito
@@ -221,17 +157,6 @@ class AVLTree:
         Método Geral de Rebalanceamento AVL.
         Avalia a invariante de balanceamento (|FB| <= 1). Caso violada, escolhe
         e executa a rotação exata requerida, retornando a nova subárvore balanceada.
-
-        Passo a passo:
-        1. Recalcula a altura atual do nó para refletir as alterações recentes dos filhos.
-        2. Calcula o Fator de Balanceamento FB = altura(esq) - altura(dir).
-        3. Se FB > 1 (pesado à esquerda):
-           - Se FB do filho esquerdo >= 0: executa Rotação Simples LL.
-           - Se FB do filho esquerdo < 0: executa Rotação Dupla LR.
-        4. Se FB < -1 (pesado à direita):
-           - Se FB do filho direito <= 0: executa Rotação Simples RR.
-           - Se FB do filho direito > 0: executa Rotação Dupla RL.
-        5. Se -1 <= FB <= 1: a invariante é respeitada; retorna o nó inalterado.
         """
         # Passo 1: Atualiza a altura do nó
         self._atualizar_altura(no)
@@ -341,9 +266,7 @@ class AVLTree:
         """
         return self._buscar_no_recursivo(self.raiz, cpf) is not None
 
-    # =========================================================================
-    # 4. Operações Complexas: Remoção (3 Casos de BST + Rebalanceamento) e Atualização
-    # =========================================================================
+    # Operações Complexas: Remoção (3 Casos de BST + Rebalanceamento) e Atualização
 
     def _encontrar_minimo(self, no: AVLNode) -> AVLNode:
         """
@@ -372,30 +295,7 @@ class AVLTree:
         return True
 
     def _remover_recursivo(self, no: Optional[AVLNode], cpf: str) -> Optional[AVLNode]:
-        """
-        Passo a passo da remoção recursiva em Árvore AVL:
-        1. Caso Base: Se o nó for nulo, retorna None.
-        2. Navegação BST:
-           - Se cpf < no.cpf: no.esquerda = _remover_recursivo(no.esquerda, cpf)
-           - Se cpf > no.cpf: no.direita = _remover_recursivo(no.direita, cpf)
-        3. Nó Localizado (cpf == no.cpf) - Tratamento dos 3 Casos Canônicos de BST:
-           - CASO 1: Nó Folha (sem filhos):
-             Decrementa o contador total de nós e retorna None ao pai.
-           - CASO 2a: Nó possui apenas Filho Direito:
-             Decrementa o contador e retorna o filho direito para substituir o nó.
-           - CASO 2b: Nó possui apenas Filho Esquerdo:
-             Decrementa o contador e retorna o filho esquerdo para substituir o nó.
-           - CASO 3: Nó possui DOIS Filhos (esquerda e direita presentes):
-             a. Localiza o Sucessor In-Order (menor nó da subárvore direita).
-             b. Copia os dados do sucessor (cpf e payload) para o nó atual.
-             c. Remove recursivamente o nó sucessor da subárvore direita.
-                (O contador total de nós será decrementado na chamada recursiva do sucessor).
-        4. Se após a remoção o nó se tornou nulo (remoção de folha isolada), retorna None.
-        5. Rebalanceamento Ascendente:
-           - Ao desempilhar a recursão, chama balancear(no) para cada ancestral até a raiz.
-           - Recalcula a altura e dispara rotações caso |FB| > 1.
-        6. Retorna a subárvore rebalanceada.
-        """
+        
         if no is None:
             return None
 
@@ -455,9 +355,7 @@ class AVLTree:
         no.payload = novo_payload
         return True
 
-    # =========================================================================
-    # 5. Travessias e Diagnósticos
-    # =========================================================================
+    # Travessias e Diagnósticos
 
     def em_ordem(self) -> List[Tuple[str, ClientePayload]]:
         """

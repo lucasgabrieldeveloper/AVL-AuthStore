@@ -2,7 +2,7 @@
 Modelos de dados fundamentais para o sistema AVL-AuthStore.
 
 Define as estruturas base de armazenamento em memória:
-- ClientePayload: Objeto que encapsula os dados cadastrais do cliente (Valor no dicionário).
+- ClientePayload: Objeto que encapsula os dados cadastrais do cliente.
 - AVLNode: Estrutura do nó da árvore balanceada AVL contendo chave, valor, altura e ponteiros.
 """
 
@@ -45,7 +45,7 @@ class ClientePayload:
 
 class AVLNode:
     """
-    Representação do Nó da Árvore AVL (Árvore Binária de Busca Auto-Balanceada).
+    Representação do Nó da Árvore AVL.
 
     Atributos:
         cpf (str): Chave primária de identificação do cliente (única e imutável).
